@@ -1,0 +1,69 @@
+/*
+ * Copyright (C) 2005-2006 Josh A. Beam
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *   1. Redistributions of source code must retain the above copyright
+ *      notice, this list of conditions and the following disclaimer.
+ *   2. Redistributions in binary form must reproduce the above copyright
+ *      notice, this list of conditions and the following disclaimer in the
+ *      documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+struct pixel_in {
+	float3 color : COLOR0;
+	float3 texcoord : TEXCOORD0;
+	float3 lightpos1 : TEXCOORD1;
+	float3 lightpos2 : TEXCOORD2;
+	float3 lightpos3 : TEXCOORD3;
+};
+
+struct pixel_out {
+	float4 color : COLOR;
+};
+
+pixel_out
+main(pixel_in IN, uniform sampler2D texture : TEXUNIT0,
+     uniform sampler2D normalmap : TEXUNIT1)
+{
+	const float3 ambient = { 0.0, 0.0, 0.1 };
+	const float3 lightcolor1 = { 1.0, 0.0, 0.0 };
+	const float3 lightcolor2 = { 0.0, 1.0, 0.0 };
+	const float3 lightcolor3 = { 0.0, 0.0, 1.0 };
+	pixel_out OUT;
+
+	// get normal from normalmap
+	float3 normal = (tex2D(normalmap, IN.texcoord).rgb * 2.0) - 1.0;
+
+	// calculate diffuse
+	float3 diffuse = float3(0, 0, 0);
+	float3 l;
+	// add light 1
+	l = normalize(IN.lightpos1);
+	diffuse += lightcolor1 * saturate(dot(normal, l));
+	// add light 2
+	l = normalize(IN.lightpos2);
+	diffuse += lightcolor2 * saturate(dot(normal, l));
+	// add light 3
+	l = normalize(IN.lightpos3);
+	diffuse += lightcolor3 * saturate(dot(normal, l));
+
+	// set output color
+	OUT.color.rgb = tex2D(texture, IN.texcoord).rgb * (diffuse + ambient);
+	OUT.color.a = 1.0;
+
+	return OUT;
+}

@@ -1,0 +1,21 @@
+jab_normalmap (December 27, 2006)
+---------------------------------
+This is a small OpenGL application that demonstrates normal mapping, a
+lighting technique that can cause flat surfaces appear to have depth.
+The normal mapping is accomplished with a fragment program written in Cg
+and compiled into the ARB_fragment_program shader language. The application
+is written in C and also requires SDL.
+
+To build the program, just run 'make' in the jab_normalmap directory. This
+will create a jab_normalmap executable that you will then be able to run.
+You may have to edit the Makefile if your GL headers/libraries are not under
+the /usr/X11R6 directory. The build.sh script will re-compile the fragment
+program using cgc before running make. This program was developed and
+tested on Slackware Linux.
+
+This program is released under a BSD-style license. You can find the
+copyright notice and license conditions at the beginning of any of the
+source code files (such as main.c).
+
+Josh Beam
+http://joshbeam.com/
